@@ -30,9 +30,8 @@ Run `$ rubocop` for linter check.
 
 ## Turbo Drive
 
-Links:
-
-https://hotwired.dev/
+Links: \
+https://hotwired.dev/ \
 https://turbo.hotwired.dev/handbook/drive
 
 ### Task 1
@@ -50,10 +49,9 @@ Turbo.session.drive = false
 
 ## Turbo Frames
 
-Links:
-
-https://turbo.hotwired.dev/handbook/frames
-https://rubydoc.info/github/hotwired/turbo-rails/Turbo%2FFramesHelper:turbo_frame_tag
+Links: \
+https://turbo.hotwired.dev/handbook/frames \
+https://rubydoc.info/github/hotwired/turbo-rails/Turbo%2FFramesHelper:turbo_frame_tag \
 https://apidock.com/rails/ActionView/RecordIdentifier/dom_id
 
 ### Task 1: edit in place for cards
@@ -250,8 +248,7 @@ Add turbo frames to board headers to edit board name in place
 
 ## Turbo Streams
 
-Links:
-
+Links: \
 https://turbo.hotwired.dev/handbook/streams
 
 ### Task 1: Fix deleting cards
@@ -403,9 +400,8 @@ https://turbo.hotwired.dev/handbook/streams
 
 ## Turbo Broadcasts
 
-Links:
-
-https://www.rubydoc.info/gems/turbo-rails/Turbo/Broadcastable
+Links: \
+https://www.rubydoc.info/gems/turbo-rails/Turbo/Broadcastable \
 https://www.hotrails.dev/turbo-rails/turbo-streams
 
 ### Task 1: Adding broadcasts to columns
@@ -428,7 +424,7 @@ also within the same file add turbo stream tag that we will use to append broadc
       <% @board_columns.each do |board_column| %>
          <%= render partial: 'board_columns/board_column', locals: { board_column: board_column } %>
       <% end %>
-      <%= turbo_frame_tag dom_id(@board, 'columns') # newly added line %> 
+      <%= turbo_frame_tag dom_id(@board, 'columns') # newly added line %>
       <%= turbo_frame_tag dom_id(BoardColumn.new) %>
    ```
 </details>
@@ -443,9 +439,9 @@ also within the same file add turbo stream tag that we will use to append broadc
    ```rb
    class BoardColumn < ApplicationRecord
    include ActionView::RecordIdentifier
-   
+
    # ... leave old code
-   
+
    broadcasts_to ->(board_column) { "board_#{board_column.board_id}" },
              target: ->(board_column) { "columns_board_#{board_column.board.id}" },
              inserts_by: :append
@@ -466,11 +462,11 @@ also within the same file add turbo stream tag that we will use to append broadc
       include ActionView::RecordIdentifier
 
       # ... leave old code
-      
+
       after_commit :touch_affected_board_columns
-      
+
       private
-      
+
       def touch_affected_board_columns
          if previous_changes[:board_column_id].present?
             board.board_columns.find_by(id: previous_changes[:board_column_id]&.first)&.touch
@@ -483,4 +479,4 @@ also within the same file add turbo stream tag that we will use to append broadc
    ```
 </details>
 
-**Branch with all deletes fixed:** `git checkout turbo-broadcasts`
+**Branch with broadcasts:** `git checkout turbo-broadcasts`
