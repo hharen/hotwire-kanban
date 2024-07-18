@@ -403,6 +403,11 @@ https://turbo.hotwired.dev/handbook/streams
 
 ## Turbo Broadcasts
 
+Links:
+
+https://www.rubydoc.info/gems/turbo-rails/Turbo/Broadcastable
+https://www.hotrails.dev/turbo-rails/turbo-streams
+
 ### Task 1: Adding broadcasts to columns
 
 1. Update `app/views/boards/show.html.erb` -
