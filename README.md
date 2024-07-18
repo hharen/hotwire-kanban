@@ -397,6 +397,120 @@ https://turbo.hotwired.dev/handbook/streams
 
 **Branch with all deletes fixed:** `git checkout turbo-frames-deletes`
 
+### Task 4: Create new Cards with Turbo Streams
+
+1. Extract 'New Card link' into partial - create `app/views/cards/_new_card.html.erb`:
+   <details>
+    <summary>Created file:</summary>
+
+    ```erb
+    <%= link_to new_card_url(board_column_id: board_column.id), class: 'text-success fs-2' do %>
+        <div class="fa-solid fa-plus"></div>
+    <% end %>
+    ```
+</details>
+
+2. Use new partial in `app/views/board_columns/_board_column.html.erb`:
+    <details>
+    <summary>Updated file:</summary>
+
+    ```erb
+    <div class="board-column-footer">
+        <%= render partial: 'cards/new_card', locals: { board_column: board_column } %>
+    </div>
+    ```
+</details>
+
+3. Render new card form in place: wrap link to New Card into turbo frame in `app/views/cards/_new_card.html.erb`:
+    <details>
+    <summary>Updated file:</summary>
+
+    ```erb
+    <%= turbo_frame_tag dom_id(board_column, :new_card) do %>
+        <%= link_to new_card_url(board_column_id: board_column.id), class: 'text-success fs-2' do %>
+            <div class="fa-solid fa-plus"></div>
+        <% end %>
+    <% end %>
+    ```
+</details>
+
+4. Wrap 'form' into turbo frame in `app/views/cards/new.html.erb`:
+    <details>
+    <summary>Updated file:</summary>
+
+    ```erb
+    <h1 class="text-primary-dark-500">New Card</h1>
+
+    <div class="row w-100 justify-content-center mt-3">
+        <%= turbo_frame_tag dom_id(@card.board_column, :new_card) do %>
+            <div class="border border-primary-grey-200 bg-light p-2">
+                <%= render 'form' %>
+            </div>
+        <% end %>
+    </div>
+    ```
+</details>
+
+5. Create turbo_stream response - update `app/controllers/cards_controller.rb#create` -
+    <details>
+    <summary>Updated file:</summary>
+
+    ```rb
+    respond_to do |format|
+      if service.call
+        @card = service.card
+        format.html { redirect_to board_url(@card.board), notice: "Card was successfully created." }
+        format.turbo_stream
+      else
+        @card = service.card
+        format.html { render :new, status: :unprocessable_entity }
+      end
+    end
+    ```
+</details>
+
+6. Create `app/views/cards/create.turbo_stream.erb`:
+    <details>
+    <summary>Created file:</summary>
+
+    ```erb
+    <%= turbo_stream.append dom_id(@card.board_column, :column_body) do %>
+        <%= render 'cards/card', card: @card %>
+    <% end %>
+    <%= turbo_stream.replace dom_id(@card.board_column, :new_card) do %>
+        <%= render 'cards/new_card', board_column: @card.board_column %>
+    <% end %>
+    ```
+</details>
+
+
+### Task 5: Create new Boards with Turbo Streams
+
+Add create-in-place for boards.
+    <details>
+    <summary>Updated files</summary>
+
+    No solution here.
+    Try to implement it on your own. You can do it! 💪
+    Or, checkout to branch with solution.
+</details>
+
+
+### Task 6: Create new Board Columns with Turbo Streams
+
+Add create-in-place for board columns. Ideally, new columns should be added
+right to existing ones.
+    <details>
+    <summary>Updated files</summary>
+
+    No solution here.
+    Try to implement it on your own. You can do it! 💪
+    Or, checkout to branch with solution.
+</details>
+
+
+**Branch with all records creation:** `git checkout turbo-frames-creates`
+
 
 ## Turbo Broadcasts
 
