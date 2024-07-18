@@ -399,3 +399,81 @@ https://turbo.hotwired.dev/handbook/streams
 
 
 **Branch with all deletes fixed:** `git checkout turbo-frames-deletes`
+
+
+## Turbo Broadcasts
+
+### Task 1: Adding broadcasts to columns
+
+1. Update `app/views/boards/show.html.erb` -
+   Add turbo stream tag to connect user to websocket channel at the top of file
+ <details>
+    <summary>Updated file:</summary>
+
+   ```erb
+      <%= turbo_stream_from dom_id(@board) %>
+   ```
+</details>
+
+also within the same file add turbo stream tag that we will use to append broadcasted columns
+<details>
+   <summary>Updated file:</summary>
+
+   ```erb
+      <% @board_columns.each do |board_column| %>
+         <%= render partial: 'board_columns/board_column', locals: { board_column: board_column } %>
+      <% end %>
+      <%= turbo_frame_tag dom_id(@board, 'columns') %> # newly added line
+      <%= turbo_frame_tag dom_id(BoardColumn.new) %>
+   ```
+</details>
+
+2. Update `app/models/board_column.rb` -
+   include ActionView::RecordIdentifier library to use `dom_id` in model,
+   add broadcast callback to model
+
+<details>
+   <summary>Updated file:</summary>
+
+   ```rb
+   class BoardColumn < ApplicationRecord
+   include ActionView::RecordIdentifier
+   
+   # ...
+   
+   broadcasts_to ->(board_column) { "board_#{board_column.board_id}" },
+             target: ->(board_column) { "columns_board_#{board_column.board.id}" },
+             inserts_by: :append
+   ```
+</details>
+
+
+### Task 2: Triggering columns broadcasts on card changes
+
+1. Update `app/models/card.rb` -
+   add callback that will touch and update associated columns while modifying cards
+
+<details>
+    <summary>Updated file:</summary>
+
+   ```rb
+   class Card < ApplicationRecord
+      include ActionView::RecordIdentifier
+   
+      after_commit :touch_affected_board_columns
+      
+      private
+      
+         def touch_affected_board_columns
+         if previous_changes[:board_column_id].present?
+            board.board_columns.find_by(id: previous_changes[:board_column_id]&.first)&.touch
+            board.board_columns.find_by(id: previous_changes[:board_column_id]&.last)&.touch
+         else
+            board_column.touch
+         end
+      end
+   end
+   ```
+</details>
+
+**Branch with all deletes fixed:** `git checkout turbo-broadcasts`
