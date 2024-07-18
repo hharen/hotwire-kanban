@@ -413,7 +413,7 @@ https://www.hotrails.dev/turbo-rails/turbo-streams
 1. Update `app/views/boards/show.html.erb` -
    Add turbo stream tag to connect user to websocket channel at the top of file
  <details>
-    <summary>Updated file:</summary>
+    <summary>New line:</summary>
 
    ```erb
       <%= turbo_stream_from dom_id(@board) %>
@@ -422,13 +422,13 @@ https://www.hotrails.dev/turbo-rails/turbo-streams
 
 also within the same file add turbo stream tag that we will use to append broadcasted columns
 <details>
-   <summary>Updated file:</summary>
+   <summary>New line in file placement:</summary>
 
    ```erb
       <% @board_columns.each do |board_column| %>
          <%= render partial: 'board_columns/board_column', locals: { board_column: board_column } %>
       <% end %>
-      <%= turbo_frame_tag dom_id(@board, 'columns') %> # newly added line
+      <%= turbo_frame_tag dom_id(@board, 'columns') # newly added line %> 
       <%= turbo_frame_tag dom_id(BoardColumn.new) %>
    ```
 </details>
@@ -444,7 +444,7 @@ also within the same file add turbo stream tag that we will use to append broadc
    class BoardColumn < ApplicationRecord
    include ActionView::RecordIdentifier
    
-   # ...
+   # ... leave old code
    
    broadcasts_to ->(board_column) { "board_#{board_column.board_id}" },
              target: ->(board_column) { "columns_board_#{board_column.board.id}" },
@@ -464,12 +464,14 @@ also within the same file add turbo stream tag that we will use to append broadc
    ```rb
    class Card < ApplicationRecord
       include ActionView::RecordIdentifier
-   
+
+      # ... leave old code
+      
       after_commit :touch_affected_board_columns
       
       private
       
-         def touch_affected_board_columns
+      def touch_affected_board_columns
          if previous_changes[:board_column_id].present?
             board.board_columns.find_by(id: previous_changes[:board_column_id]&.first)&.touch
             board.board_columns.find_by(id: previous_changes[:board_column_id]&.last)&.touch
