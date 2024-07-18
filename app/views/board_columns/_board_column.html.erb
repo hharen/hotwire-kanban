@@ -3,9 +3,7 @@
 
   <div id= <%= dom_id(board_column, :column_body) %>, class="board-column-body", data-sortable-target="cardsContainer">
     <% board_column.cards.order(:position).each do |card| %>
-      <div class="draggable_card my-1" data-sortable-id="<%= card.id %>">
-        <%= render partial: 'cards/card', locals: { card: card } %>
-      </div>
+      <%= render partial: 'cards/card', locals: { card: card } %>
     <% end %>
   </div>
 
